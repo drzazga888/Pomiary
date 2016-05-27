@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Pomiary</string>
+    <string name="action_settings">Ustawienia</string>
+    <string name="measure_delete">Usuń</string>
+    <string name="measure_favourite">Ulubione</string>
+    <string name="change_category">Zmień kategorię (max. 1)</string>
+    <string name="no_category">Brak kategorii</string>
+    <string name="title_activity_measure">MeasureActivity</string>
+    <string name="action_delete_measure">Usuń pomiar</string>
+    <string name="action_change_category">Zmień kategorię</string>
+    <string name="action_about">O aplikacji…</string>
+    <string name="selected_count">"Zaznaczono: "</string>
+    <string name="createMeasure">Utwórz pomiar</string>
+    <string name="change">Zmień</string>
+    <string name="cancel">Anuluj</string>
+    <string name="close">Zamknij</string>
+    <string name="delete_measure_message">Czy na pewno chcesz usunąć zaznaczone pomiary?</string>
+    <string name="remove">Usuń</string>
+    <string name="reject_category">Odrzuć kategorię</string>
+    <string name="AddMeasureItem">Dodaj element pomiaru</string>
+    <string name="point">Punkt</string>
+    <string name="line">Linia</string>
+    <string name="angle">Kąt</string>
+    <string name="measure_name_hint">Podaj nazwę pomiaru</string>
+    <string name="category">Kategoria</string>
+    <string name="app_description"><![CDATA[Aplikacja służy do zapisywania pomiarów 2D takich jak np. odległości od punktów czy też kąty jakie między trzema punktami występują.\n\nProjekt zaliczeniowy na przedmiot \"Aplikacje mobilne\".\n\nAutor: Kamil Drzazga]]></string>
+    <string name="select_category">Wybierz kategorię (max. 1)</string>
+    <string name="measure_name_constraint">Nazwa pomiaru nie może być pusta i nie może się powtarzać</string>
+</resources>
