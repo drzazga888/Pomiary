@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color1">#006064</color>
+    <color name="color2">#00897b</color>
+    <color name="color3">#66bb6a</color>
+    <color name="color4">#c0ca33</color>
+    <color name="color5">#ef5350</color>
+    <!-- main -->
+    <color name="colorPrimary">@color/color2</color>
+    <color name="colorPrimaryDark">@color/color1</color>
+    <color name="colorAccent">@color/color4</color>
+    <color name="colorTransparent">#00000000</color>
+    <!-- measure data -->
+    <color name="colorStartPoint">@color/color5</color>
+    <color name="colorPoint">@color/color4</color>
+    <color name="colorLine">@color/color3</color>
+    <color name="colorAngle">@color/color2</color>
+    <color name="colorNotFocused">#666666</color>
+</resources>

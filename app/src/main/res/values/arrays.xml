@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="measure_item_types">
+        <item>@string/point</item>
+        <item>@string/line</item>
+        <item>@string/angle</item>
+    </array>
+</resources>

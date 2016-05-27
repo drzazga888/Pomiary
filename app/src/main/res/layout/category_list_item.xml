@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/categoryBorder"
+        android:orientation="horizontal"
+        android:layout_width="@dimen/list_view_border_size"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"></LinearLayout>
+
+    <TextView
+        android:id="@+id/categoryName"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minHeight="?android:listPreferredItemHeightSmall"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dialog_item_margin_border"
+        android:text="Nazwa kategorii"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</LinearLayout>
