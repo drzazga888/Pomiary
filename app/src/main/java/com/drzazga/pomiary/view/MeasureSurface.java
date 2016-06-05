@@ -13,16 +13,13 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 
 import com.drzazga.pomiary.R;
-import com.drzazga.pomiary.model.DatabaseModel;
 import com.drzazga.pomiary.model.MeasureAngleData;
 import com.drzazga.pomiary.model.MeasureData;
 import com.drzazga.pomiary.model.MeasureDataElement;
 import com.drzazga.pomiary.model.MeasureLineData;
 import com.drzazga.pomiary.model.MeasurePointData;
-import com.drzazga.pomiary.utils.MathExtra;
 
 public class MeasureSurface extends View {
 
@@ -32,7 +29,6 @@ public class MeasureSurface extends View {
     public static final float ANGLE_CIRCLE_R = (float) 100.0;
     public static final float TEXT_SIZE = (float) 24.0;
 
-    private final DatabaseModel databaseModel = new DatabaseModel(getContext());
     private int measureId;
     private final Paint paintStartPoint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint paintPoint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -43,12 +39,12 @@ public class MeasureSurface extends View {
     private final Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getContext(), new MeasureSurfaceGestureListener());
-    private MeasureData data;
+    private MeasureData data = new MeasureData(getContext());
 
     public MeasureSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.i("extras", String.valueOf(((Activity) context).getIntent().getExtras()));
         measureId = ((Activity) context).getIntent().getExtras().getInt("id");
-        data = databaseModel.getMeasureData(measureId);
         paintStartPoint.setColor(ContextCompat.getColor(context, R.color.colorStartPoint));
         paintPoint.setColor(ContextCompat.getColor(context, R.color.colorPoint));
         paintLine.setColor(ContextCompat.getColor(context, R.color.colorLine));
@@ -62,6 +58,7 @@ public class MeasureSurface extends View {
         paintNotFocusedOutline = new Paint(paintNotFocused);
         paintNotFocusedOutline.setStyle(Paint.Style.STROKE);
         paintNotFocusedOutline.setStrokeWidth(STROKE_WIDTH);
+        data.load(measureId);
     }
 
     private Paint decideOnPaint(MeasureDataElement item, Paint focused, Paint notFocused) {

@@ -1,30 +1,33 @@
 package com.drzazga.pomiary.activity;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.ActionMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.drzazga.pomiary.R;
-import com.drzazga.pomiary.adapter.MeasureListAdapter;
-import com.drzazga.pomiary.fragment.AboutDialogFragment;
-import com.drzazga.pomiary.fragment.ChangeCategoryDialogFragment;
-import com.drzazga.pomiary.fragment.ConfirmMeasureDeleteDialogFragment;
-import com.drzazga.pomiary.model.DatabaseModel;
+import com.drzazga.pomiary.adapter.HomePagerAdapter;
+import com.drzazga.pomiary.fragment.MultiChoiceListFragment;
+import com.drzazga.pomiary.fragment.dialog.AboutDialogFragment;
+import com.drzazga.pomiary.model.MeasureProvider;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnDemandLoaderRestarter {
 
-    private DatabaseModel databaseModel = new DatabaseModel(this);
-    private MeasureListAdapter measureListAdapter;
+    private ViewPager pager;
+    private HomePagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,75 +37,24 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        pager = (ViewPager) findViewById(R.id.pager);
+        pagerAdapter = new HomePagerAdapter(getSupportFragmentManager(), this);
+        pager.setAdapter(pagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        assert tabLayout != null;
+        tabLayout.setupWithViewPager(pager);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getBaseContext(), NewMeasureActivity.class);
-                startActivity(intent);
-            }
-        });
+        fab.setOnClickListener(this);
+    }
 
-        final ListView measureList = (ListView) findViewById(R.id.measuresView);
-        assert measureList != null;
-        measureList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getBaseContext(), MeasureActivity.class);
-                intent.putExtra("id", measureListAdapter.getIdByPosition(position));
-                startActivity(intent);
-            }
-        });
-        measureList.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                measureListAdapter.setSelected(position, checked);
-                mode.setTitle(getString(R.string.selected_count) + measureListAdapter.sizeSelected());
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                getMenuInflater().inflate(R.menu.menu_selected_measure, menu);
-                mode.setTitle(getString(R.string.selected_count) + measureListAdapter.sizeSelected());
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                DialogFragment fragment;
-                switch (item.getItemId()) {
-                    case R.id.action_delete_measure:
-                        fragment = new ConfirmMeasureDeleteDialogFragment();
-                        fragment.setArguments(measureListAdapter.getSelectedIds());
-                        fragment.show(getSupportFragmentManager(), "deleteMeasure");
-                        measureListAdapter.resetSelected();
-                        mode.finish();
-                        return true;
-                    case R.id.action_change_category:
-                        fragment = new ChangeCategoryDialogFragment();
-                        fragment.setArguments(measureListAdapter.getSelectedIds());
-                        fragment.show(getSupportFragmentManager(), "changeCategory");
-                        measureListAdapter.resetSelected();
-                        mode.finish();
-                        return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                measureListAdapter.resetSelected();
-            }
-        });
-        measureListAdapter = new MeasureListAdapter(this, databaseModel.getMeasureCursor());
-        measureList.setAdapter(measureListAdapter);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        restartLoader(HomePagerAdapter.MEASURE_LIST_FRAGMENT_ID);
+        restartLoader(HomePagerAdapter.CATEGORY_LIST_FRAGMENT_ID);
     }
 
     @Override
@@ -120,5 +72,50 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Class<?> target;
+        switch (pager.getCurrentItem()) {
+            case 0:
+                target = NewMeasureActivity.class;
+                break;
+            case 1:
+                target = NewCategoryActivity.class;
+                break;
+            default:
+                throw new RuntimeException();
+        }
+        Intent intent = new Intent(this, target);
+        startActivity(intent);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case HomePagerAdapter.MEASURE_LIST_FRAGMENT_ID:
+                return new CursorLoader(this, Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "measure"), null, null, null, null);
+            case HomePagerAdapter.CATEGORY_LIST_FRAGMENT_ID:
+                return new CursorLoader(this, Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "category"), null, null, null, null);
+        }
+        return null;
+    }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.i("testing", this + " -> LoaderManagerCallback -> onLoadFinished, id = " + loader.getId());
+        MultiChoiceListFragment fragment = pagerAdapter.getSpecificItem(loader.getId());
+        fragment.getAdapter().swapCursor(data);
+        fragment.toggleListVisibilityIfNeeded(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        pagerAdapter.getSpecificItem(loader.getId()).getAdapter().swapCursor(null);
+    }
+
+    @Override
+    public void restartLoader(Integer id) {
+        getLoaderManager().restartLoader(id, null, this);
     }
 }

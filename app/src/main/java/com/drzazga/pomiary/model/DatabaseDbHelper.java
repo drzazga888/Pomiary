@@ -6,11 +6,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 14;
+    public static final int DATABASE_VERSION = 19;
     public static final String DATABASE_NAME = "Database.db";
 
     public DatabaseDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        db.execSQL("PRAGMA foreign_keys = ON");
     }
 
     @Override

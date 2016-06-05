@@ -21,45 +21,54 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:orientation="vertical">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:divider="?android:dividerHorizontal">
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:orientation="vertical">
 
-            <EditText
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/measureName"
-                android:hint="@string/measure_name_hint"
-                android:inputType="text"
-                android:layout_marginBottom="@dimen/little_margin"
-                android:layout_marginTop="@dimen/little_margin" />
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:divider="?android:dividerHorizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_category"
-                android:id="@+id/textView"
-                android:layout_marginTop="@dimen/little_margin"
-                android:layout_marginBottom="@dimen/little_margin" />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/measureName"
+                    android:hint="@string/measure_name_hint"
+                    android:inputType="text"
+                    android:layout_marginBottom="@dimen/little_margin"
+                    android:layout_marginTop="@dimen/little_margin" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/select_category"
+                    android:id="@+id/textView"
+                    android:layout_marginTop="@dimen/little_margin"
+                    android:layout_marginBottom="@dimen/little_margin" />
+
+            </LinearLayout>
+
+            <fragment
+                class="com.drzazga.pomiary.fragment.CategorySingleFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/list_fragment"
+                tools:layout="@layout/fragment_recycler_view" />
 
         </LinearLayout>
 
-        <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/categoryListView"
-            android:choiceMode="singleChoice" />
-
-    </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

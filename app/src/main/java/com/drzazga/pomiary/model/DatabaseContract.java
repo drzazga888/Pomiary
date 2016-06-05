@@ -46,6 +46,7 @@ public final class DatabaseContract {
     public static abstract class ViewMeasures implements BaseColumns {
         public static final String TABLE_NAME = "measures_view";
         public static final String COLUMN_NAME = Measures.COLUMN_NAME;
+        public static final String COLUMN_CATEGORY_ID = Measures.COLUMN_CATEGORY_ID;
         public static final String COLUMN_CATEGORY_NAME = "category_name";
         public static final String COLUMN_CATEGORY_COLOR = "category_color";
         public static final String COLUMN_CREATION_DATE = Measures.COLUMN_CREATION_DATE;
@@ -61,7 +62,7 @@ public final class DatabaseContract {
             "CREATE TABLE " + Measures.TABLE_NAME + " (" +
                     Measures._ID + " INTEGER PRIMARY KEY," +
                     Measures.COLUMN_NAME + " TEXT UNIQUE NOT NULL," +
-                    Measures.COLUMN_CATEGORY_ID + " REFERENCES " + Categories.TABLE_NAME + "(" + Categories._ID + ") ON DELETE CASCADE, " +
+                    Measures.COLUMN_CATEGORY_ID + " REFERENCES " + Categories.TABLE_NAME + "(" + Categories._ID + ") ON DELETE SET NULL, " +
                     Measures.COLUMN_CREATION_DATE + " INTEGER DEFAULT CURRENT_TIMESTAMP NOT NULL)";
 
     public static final String SQL_CREATE_MEASURE_POINTS =
@@ -94,6 +95,7 @@ public final class DatabaseContract {
             "CREATE VIEW " + ViewMeasures.TABLE_NAME + " AS SELECT " +
                     Measures.TABLE_NAME + "." + Measures._ID + " AS " + ViewMeasures._ID + ", " +
                     Measures.TABLE_NAME + "." + Measures.COLUMN_NAME + " AS " + ViewMeasures.COLUMN_NAME + ", " +
+                    Categories.TABLE_NAME + "." + Categories._ID + " AS " + ViewMeasures.COLUMN_CATEGORY_ID + ", " +
                     Categories.TABLE_NAME + "." + Categories.COLUMN_NAME + " AS " + ViewMeasures.COLUMN_CATEGORY_NAME + ", " +
                     Categories.TABLE_NAME + "." + Categories.COLUMN_COLOR + " AS " + ViewMeasures.COLUMN_CATEGORY_COLOR + ", " +
                     "datetime(" + Measures.TABLE_NAME + "." + Measures.COLUMN_CREATION_DATE + ") AS " + ViewMeasures.COLUMN_CREATION_DATE +

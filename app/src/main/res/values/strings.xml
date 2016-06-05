@@ -1,12 +1,11 @@
 <resources>
     <string name="app_name">Pomiary</string>
     <string name="action_settings">Ustawienia</string>
-    <string name="measure_delete">Usuń</string>
     <string name="measure_favourite">Ulubione</string>
     <string name="change_category">Zmień kategorię (max. 1)</string>
     <string name="no_category">Brak kategorii</string>
     <string name="title_activity_measure">MeasureActivity</string>
-    <string name="action_delete_measure">Usuń pomiar</string>
+    <string name="delete">Usuń</string>
     <string name="action_change_category">Zmień kategorię</string>
     <string name="action_about">O aplikacji…</string>
     <string name="selected_count">"Zaznaczono: "</string>
@@ -15,7 +14,6 @@
     <string name="cancel">Anuluj</string>
     <string name="close">Zamknij</string>
     <string name="delete_measure_message">Czy na pewno chcesz usunąć zaznaczone pomiary?</string>
-    <string name="remove">Usuń</string>
     <string name="reject_category">Odrzuć kategorię</string>
     <string name="AddMeasureItem">Dodaj element pomiaru</string>
     <string name="point">Punkt</string>
@@ -25,5 +23,21 @@
     <string name="category">Kategoria</string>
     <string name="app_description"><![CDATA[Aplikacja służy do zapisywania pomiarów 2D takich jak np. odległości od punktów czy też kąty jakie między trzema punktami występują.\n\nProjekt zaliczeniowy na przedmiot \"Aplikacje mobilne\".\n\nAutor: Kamil Drzazga]]></string>
     <string name="select_category">Wybierz kategorię (max. 1)</string>
-    <string name="measure_name_constraint">Nazwa pomiaru nie może być pusta i nie może się powtarzać</string>
+    <string name="name_unique_contraint"><![CDATA[Nazwa musi być unikatowa]]></string>
+    <string name="name_not_empty_contraint"><![CDATA[Nazwa nie może być pusta]]></string>
+    <string name="measure_list_empty">Lista pomiarów jest pusta"</string>
+    <string name="categories">Kategorie</string>
+    <string name="category_list_empty">Brak kategorii"</string>
+    <string name="createCategory">Utwórz kategorię</string>
+    <string name="measure_category_hint">Podaj nazwę kategorii</string>
+    <string name="select_category_color">Wybierz kolor kategorii</string>
+    <string name="select">Wybierz…</string>
+    <string name="manageCategory">Zarządzaj kategorią</string>
+    <string name="update">Zaktualizuj</string>
+    <string name="manageMeasure">Zarządzaj pomiarem</string>
+    <string name="accept">Akceptuj</string>
+    <string name="delete_category_message">Czy chcesz usunąć zaznaczone kategorie? Po tej operacji powiązane z nimi pomiary nie będą miały kategorii.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

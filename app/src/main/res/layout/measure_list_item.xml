@@ -2,7 +2,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:id="@+id/measureListLayout">
+    android:id="@+id/measureListLayout"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:id="@+id/measureBorder"

@@ -1,4 +1,4 @@
-package com.drzazga.pomiary.fragment;
+package com.drzazga.pomiary.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

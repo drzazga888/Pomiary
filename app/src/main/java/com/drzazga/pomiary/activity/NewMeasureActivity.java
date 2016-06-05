@@ -1,76 +1,52 @@
 package com.drzazga.pomiary.activity;
 
+import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteConstraintException;
-import android.os.Bundle;
+import android.database.SQLException;
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ListView;
 
 import com.drzazga.pomiary.R;
-import com.drzazga.pomiary.adapter.CategoryListAdapter;
-import com.drzazga.pomiary.model.DatabaseModel;
+import com.drzazga.pomiary.model.DatabaseContract;
+import com.drzazga.pomiary.model.MeasureProvider;
 
-public class NewMeasureActivity extends AppCompatActivity {
-
-    private DatabaseModel databaseModel = new DatabaseModel(this);
-    private EditText inputName;
-    private View rootView;
-    CategoryListAdapter categoryListAdapter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_measure);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        ListView lv = (ListView) findViewById(R.id.categoryListView);
-        assert lv != null;
-        categoryListAdapter = new CategoryListAdapter(this, databaseModel.getCategoryCursor());
-        lv.setAdapter(categoryListAdapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                categoryListAdapter.select(position);
-            }
-        });
-
-        inputName = (EditText) findViewById(R.id.measureName);
-        rootView = findViewById(android.R.id.content);
-    }
+public class NewMeasureActivity extends MeasurePreviewActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_new_measure, menu);
+        getMenuInflater().inflate(R.menu.menu_only_acc, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_create_measure:
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            case R.id.action_accept:
                 try {
-                    int id = (int) databaseModel.addMeasure(inputName.getText().toString(), categoryListAdapter.getSelectedId());
-                    Log.i("db_test", "dodano pomiar o id = " + id);
+                    Integer categoryId = fragment.getAdapter().getSelectedMaxOne();
+                    if (categoryId != null)
+                        categoryId = (Integer) fragment.getLayoutManager().findViewByPosition(categoryId).getTag();
+                    ContentValues values = new ContentValues();
+                    values.put(DatabaseContract.Measures.COLUMN_NAME, inputName.getText().toString());
+                    values.put(DatabaseContract.Measures.COLUMN_CATEGORY_ID, categoryId);
+                    Uri measureUri = getContentResolver().insert(Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "measure"), values);
+                    assert measureUri != null;
                     Intent intent = new Intent(this, MeasureActivity.class);
-                    intent.putExtra("id", id);
+                    intent.putExtra("id", Integer.valueOf(measureUri.getPathSegments().get(1)));
                     startActivity(intent);
-                } catch (SQLiteConstraintException e) {
-                    Snackbar.make(rootView, R.string.measure_name_constraint, Snackbar.LENGTH_LONG).show();
+                } catch (IllegalArgumentException e) {
+                    Snackbar.make(rootView, R.string.name_not_empty_contraint, Snackbar.LENGTH_LONG).show();
+                } catch (SQLException e) {
+                    Snackbar.make(rootView, R.string.name_unique_contraint, Snackbar.LENGTH_LONG).show();
                 }
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

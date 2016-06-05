@@ -1,68 +1,50 @@
 package com.drzazga.pomiary.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.model.DatabaseContract;
 
-public class CategoryListAdapter extends CursorAdapter {
+public class CategoryListAdapter extends MultiChoiceCursorAdapter<CategoryListAdapter.CategoryViewHolder> {
 
-    private Integer selected = null;
+    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
 
-    public void select(int position) {
-        if (selected != null && selected.equals(position))
-            selected = null;
-        else
-            selected = position;
-        notifyDataSetChanged();
+        public TextView name;
+        public LinearLayout border;
+
+        public CategoryViewHolder(View itemView) {
+            super(itemView);
+            name = (TextView) itemView.findViewById(R.id.categoryName);
+            border = (LinearLayout) itemView.findViewById(R.id.categoryBorder);
+        }
     }
 
-    public CategoryListAdapter(Context context, Cursor c) {
-        super(context, c, 0);
-    }
-
-    @Nullable
-    public Integer getSelectedId() {
-        if (selected != null)
-            return (Integer) getView(selected, null, null).getTag();
-        return null;
+    public CategoryListAdapter(Context context, Integer id) {
+        super(context);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i("aaa", String.valueOf(position));
-        View v = super.getView(position, convertView, parent);
-        if (selected != null && selected.equals(position))
-            v.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorPrimaryDark));
-        else
-            v.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorTransparent));
-        return v;
+    public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_item, parent, false);
+        return new CategoryViewHolder(v);
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.category_list_item, parent, false);
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        view.setTag(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.Categories._ID)));
-        TextView vName = (TextView) view.findViewById(R.id.categoryName);
-        LinearLayout vBorder = (LinearLayout) view.findViewById(R.id.categoryBorder);
+    public void onBindViewHolder(CategoryViewHolder holder, int position) {
+        super.onBindViewHolder(holder, position);
+        Log.i("testing", DatabaseUtils.dumpCursorToString(cursor));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_NAME));
         String borderColor = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_COLOR));
-        vName.setText(name);
-        vBorder.setBackgroundColor(Color.parseColor(borderColor));
+        holder.name.setText(name);
+        holder.border.setBackgroundColor(Color.parseColor(borderColor));
     }
 }

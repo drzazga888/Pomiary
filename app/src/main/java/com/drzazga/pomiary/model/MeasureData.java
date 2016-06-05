@@ -1,6 +1,10 @@
 package com.drzazga.pomiary.model;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.PointF;
+import android.net.Uri;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,13 +18,62 @@ public class MeasureData implements Iterable<MeasureDataElement> {
     public HashMap<Integer, MeasureLineData> lines = new HashMap<>();
     public HashMap<Integer, MeasureAngleData> angles = new HashMap<>();
     private boolean sthSelected = false;
+    private ContentResolver resolver;
+
+    public MeasureData(Context context) {
+        this.resolver = context.getContentResolver();
+        loseFocus();
+    }
+
+    public void clear() {
+        points.clear();
+        lines.clear();
+        angles.clear();
+    }
+
+    public void load(int measureId) {
+        int id, p0, p1, p2, x, y, relativeTo;
+        String name;
+        Cursor c = resolver.query(Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "measure/" + measureId + "/point"), null, null, null, DatabaseContract.MeasurePoints._ID + " ASC");
+        assert c != null;
+        if (c.moveToFirst()) {
+            do {
+                id = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasurePoints._ID));
+                x = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasurePoints.COLUMN_X));
+                y = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasurePoints.COLUMN_Y));
+                name = c.getString(c.getColumnIndexOrThrow(DatabaseContract.MeasurePoints.COLUMN_NAME));
+                relativeTo = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasurePoints.COLUMN_RELATIVE_TO));
+                points.put(id, new MeasurePointData(x, y, name, points.get(relativeTo)));
+            } while (c.moveToNext());
+        }
+        c = resolver.query(Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "measure/" + measureId + "/line"), null, null, null, null);
+        assert c != null;
+        if (c.moveToFirst()) {
+            do {
+                id = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureLines._ID));
+                p1 = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureLines.COLUMN_POINT_1_ID));
+                p2 = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureLines.COLUMN_POINT_2_ID));
+                name = c.getString(c.getColumnIndexOrThrow(DatabaseContract.MeasureLines.COLUMN_NAME));
+                lines.put(id, new MeasureLineData(points.get(p1), points.get(p2), name));
+            } while (c.moveToNext());
+        }
+        c = resolver.query(Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "measure/" + measureId + "/angle"), null, null, null, null);
+        assert c != null;
+        if (c.moveToFirst()) {
+            do {
+                id = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureAngles._ID));
+                p0 = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureAngles.COLUMN_POINT_0_ID));
+                p1 = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureAngles.COLUMN_POINT_1_ID));
+                p2 = c.getInt(c.getColumnIndexOrThrow(DatabaseContract.MeasureAngles.COLUMN_POINT_2_ID));
+                name = c.getString(c.getColumnIndexOrThrow(DatabaseContract.MeasureAngles.COLUMN_NAME));
+                angles.put(id, new MeasureAngleData(points.get(p0), points.get(p1), points.get(p2), name));
+            } while (c.moveToNext());
+        }
+        c.close();
+    }
 
     public boolean isSthSelected() {
         return sthSelected;
-    }
-
-    public MeasureData() {
-        loseFocus();
     }
 
     @Override

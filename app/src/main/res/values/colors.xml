@@ -16,4 +16,8 @@
     <color name="colorLine">@color/color3</color>
     <color name="colorAngle">@color/color2</color>
     <color name="colorNotFocused">#666666</color>
+    <!-- color indicators -->
+    <color name="redColorAccent">#ff1744</color>
+    <color name="greenColorAccent">#76ff03</color>
+    <color name="blueColorAccent">#29b6f6</color>
 </resources>
