@@ -15,20 +15,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.drzazga.pomiary.R;
-import com.drzazga.pomiary.fragment.dialog.AddMeasureItemDialogFragment;
+import com.drzazga.pomiary.controller.GuiHacks;
 import com.drzazga.pomiary.fragment.dialog.ConfirmActionDialogFragment;
 import com.drzazga.pomiary.fragment.dialog.ConfirmMeasureDeleteDialogFragment;
 import com.drzazga.pomiary.model.DatabaseContract;
 import com.drzazga.pomiary.model.MeasureProvider;
+import com.drzazga.pomiary.view.MeasureSurface;
 
-public class MeasureActivity extends AppCompatActivity implements ConfirmActionDialogFragment.OnFinishedListener {
+public class MeasureActivity extends AppCompatActivity implements ConfirmActionDialogFragment.OnFinishedListener, GuiHacks {
 
     private ContentResolver resolver;
     private Toolbar toolbar;
     private int id;
+    private RelativeLayout bar_holder;
+    private MeasureSurface surface;
+    private FloatingActionButton fab_add;
+    private FloatingActionButton fab_modify;
+    private FloatingActionButton fab_delete;
+    private FloatingActionButton fab_switch;
+    private LinearLayout bottomBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +53,18 @@ public class MeasureActivity extends AppCompatActivity implements ConfirmActionD
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment fragment = new AddMeasureItemDialogFragment();
-                fragment.show(getSupportFragmentManager(), "addMeasureItem");
-            }
-        });
+        fab_add = (FloatingActionButton) findViewById(R.id.fab_add);
+        fab_modify = (FloatingActionButton) findViewById(R.id.fab_modify);
+        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fab_switch = (FloatingActionButton) findViewById(R.id.fab_switch);
+        bar_holder = (RelativeLayout) findViewById(R.id.bar_holder);
+        assert bar_holder != null;
+        surface = (MeasureSurface) findViewById(R.id.surface);
+        assert surface != null;
+        fab_add.setOnClickListener(surface.getButtonAddListener());
+        fab_delete.setOnClickListener(surface.getButtonDeleteListener());
+        fab_modify.setOnClickListener(surface.getButtonModifyListener());
+        fab_switch.setOnClickListener(surface.getButtonSwitchListener());
     }
 
     @Override
@@ -105,5 +117,53 @@ public class MeasureActivity extends AppCompatActivity implements ConfirmActionD
     @Override
     public void onFinishedDialog() {
         NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public LinearLayout showBottomBar(int barRes) {
+        bottomBar = (LinearLayout) getLayoutInflater().inflate(barRes, bar_holder, false);
+        toolbar.setVisibility(Toolbar.INVISIBLE);
+        bar_holder.addView(bottomBar);
+        return bottomBar;
+    }
+
+    @Override
+    public void hideBottomBar() {
+        bar_holder.removeView(bottomBar);
+        toolbar.setVisibility(Toolbar.VISIBLE);
+    }
+
+    @Override
+    public FloatingActionButton getAddButton() {
+        return fab_add;
+    }
+
+    @Override
+    public FloatingActionButton getModifyButton() {
+        return fab_modify;
+    }
+
+    @Override
+    public FloatingActionButton getDeleteButton() {
+        return fab_delete;
+    }
+
+    @Override
+    public FloatingActionButton getSwitchButton() {
+        return fab_switch;
+    }
+
+    @Override
+    public void hideAllButtons() {
+        fab_add.hide();
+        fab_modify.hide();
+        fab_delete.hide();
+        fab_switch.hide();
+    }
+
+    @Override
+    public void redraw() {
+        if (surface != null)
+            surface.invalidate();
     }
 }

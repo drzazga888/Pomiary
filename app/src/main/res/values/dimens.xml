@@ -10,4 +10,5 @@
     <dimen name="dialog_item_margin_border">16dp</dimen>
     <dimen name="category_color_shape_len">42dp</dimen>
     <dimen name="little_margin">8dp</dimen>
+    <dimen name="button_width">56dp</dimen>
 </resources>

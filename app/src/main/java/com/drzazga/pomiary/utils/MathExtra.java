@@ -1,10 +1,33 @@
 package com.drzazga.pomiary.utils;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 
 import org.jetbrains.annotations.Contract;
 
 public class MathExtra {
+
+    public static double normalizeAngle(double angle) {
+        while (angle < 0.0)
+            angle += 2.0 * Math.PI;
+        while (angle >= 2.0 * Math.PI)
+            angle -= 2.0 * Math.PI;
+        return angle;
+    }
+
+    public static boolean betweenAngles(double theta, double startAngle, double endAngle) {
+        if (startAngle <= endAngle)
+            return startAngle < theta && endAngle > theta;
+        else
+            return !(startAngle < theta && endAngle > theta);
+    }
+
+    public static double getMiddleAngle(double startAngle, double endAngle) {
+        double avg = (startAngle + endAngle) * 0.5;
+        if (startAngle > endAngle)
+            avg = normalizeAngle(avg + Math.PI);
+        return avg;
+    }
 
     public static class PolarCoordinates {
 
@@ -34,7 +57,7 @@ public class MathExtra {
         return val >= min && val <= max;
     }
 
-    public static double getAngleFromLinePoints(PointF p1, PointF p2) {
+    public static double getAngleFromLinePoints(Point p1, Point p2) {
         return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
     }
 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/button_width"
+    android:theme="@style/BottomBar">
+
+    <ImageButton
+        android:layout_width="@dimen/button_width"
+        android:layout_gravity="center"
+        android:layout_height="match_parent"
+        android:id="@+id/action_back"
+        android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"
+        android:background="@color/colorTransparent"
+        android:contentDescription="@string/cancel" />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/input_name"
+        android:layout_weight="3"
+        android:inputType="text"
+        android:imeOptions="actionDone"
+        android:hint="@string/name_hint" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/x_text" />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:inputType="numberSigned"
+        android:id="@+id/input_x"
+        android:imeOptions="actionDone"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/y_text" />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:inputType="numberSigned"
+        android:id="@+id/input_y"
+        android:imeOptions="actionDone"
+        android:layout_weight="1" />
+
+    <ImageButton
+        android:layout_height="match_parent"
+        android:layout_width="@dimen/button_width"
+        android:layout_gravity="center"
+        android:id="@+id/action_accept"
+        android:background="@color/colorTransparent"
+        android:src="@drawable/ic_action_tick"
+        android:contentDescription="@string/accept" />
+
+</LinearLayout>

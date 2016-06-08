@@ -30,4 +30,9 @@
         <item name="colorAccent">@color/blueColorAccent</item>
     </style>
 
+    <style name="BottomBar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
 </resources>

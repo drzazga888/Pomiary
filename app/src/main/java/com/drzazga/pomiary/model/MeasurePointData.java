@@ -1,9 +1,11 @@
 package com.drzazga.pomiary.model;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.utils.MathExtra;
 import com.drzazga.pomiary.view.MeasureSurface;
 
@@ -14,45 +16,52 @@ public class MeasurePointData extends MeasureDataElement {
     public int x, y;
     public MeasurePointData relativeTo;
 
-    public MeasurePointData(int x, int y, String name, MeasurePointData relativeTo) {
-        super(name);
+    public MeasurePointData(Integer id, int x, int y, String name, MeasurePointData relativeTo) {
+        super(id, name);
         this.x = x;
         this.y = y;
-        this.relativeTo = relativeTo;
+        this.relativeTo = this instanceof MeasureStartPointData || relativeTo != null ? relativeTo : MeasureData.startPoint.get(0);
     }
 
-    public PointF getRelativePos() {
-        return new PointF(
-                x + (relativeTo != null ? relativeTo.x : MeasureSurface.POINT_START.x),
-                y + (relativeTo != null ? relativeTo.y : MeasureSurface.POINT_START.y)
-        );
+    public Point getRelativePos() {
+        Point relativeToAbsolutePos = relativeTo.getRelativePos();
+        return new Point(x + relativeToAbsolutePos.x, y + relativeToAbsolutePos.y);
     }
 
     @Override
     public String toString() {
-        return name + "(" + x + ", " + y + ")";
+        return super.toString() + "(" + x + ", " + y + ")";
     }
 
     @Override
     public boolean isSelected(PointF p) {
-        PointF circle = getRelativePos();
+        Point circle = getRelativePos();
         return MathExtra.pow2(p.x - circle.x) + MathExtra.pow2(p.y - circle.y) <= MathExtra.pow2(DETECTION_CIRCLE_R);
+    }
+
+    @Override
+    public int getBarRes() {
+        return R.layout.measure_point;
     }
 
     @Override
     public void performSelectedActon() {
         super.performSelectedActon();
         Log.i("touching", "point " + toString() + " is selected");
+
     }
 
+    @NonNull
     @Override
-    public PointF getNamePosition() {
-        return null;
+    public String getStringValue() {
+        Point relPos = getRelativePos();
+        return "(" + relPos.x + ", " + relPos.y + ")";
     }
 
     @NonNull
     @Override
     public PointF getStringValuePosition() {
-        return getRelativePos();
+        Point pos = getRelativePos();
+        return new PointF(pos.x, pos.y);
     }
 }

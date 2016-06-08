@@ -37,7 +37,7 @@
     <string name="manageMeasure">Zarządzaj pomiarem</string>
     <string name="accept">Akceptuj</string>
     <string name="delete_category_message">Czy chcesz usunąć zaznaczone kategorie? Po tej operacji powiązane z nimi pomiary nie będą miały kategorii.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name_hint">Nazwa</string>
+    <string name="x_text">x =</string>
+    <string name="y_text">y =</string>
 </resources>
