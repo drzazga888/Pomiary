@@ -1,7 +1,9 @@
 package com.drzazga.pomiary.model;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +18,7 @@ import com.drzazga.pomiary.utils.StringExtra;
 public class MeasureProvider extends ContentProvider {
 
     private SQLiteOpenHelper dbHelper;
+    private ContentResolver cr;
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final String AUTHORITY = "com.drzazga.pomiary.provider";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
@@ -45,7 +48,10 @@ public class MeasureProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        dbHelper = new DatabaseDbHelper(getContext());
+        Context context = getContext();
+        assert context != null;
+        cr = context.getContentResolver();
+        dbHelper = new DatabaseDbHelper(context);
         return true;
     }
 
@@ -83,7 +89,9 @@ public class MeasureProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException();
         }
-        return queryBuilder.query(dbHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+        Cursor c = queryBuilder.query(dbHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+        c.setNotificationUri(cr, uri);
+        return c;
     }
 
     @Nullable
@@ -116,93 +124,119 @@ public class MeasureProvider extends ContentProvider {
                 id = db.insertOrThrow(DatabaseContract.Measures.TABLE_NAME, null, simplifyName(
                         values, DatabaseContract.Measures.COLUMN_NAME
                 ));
-                return Uri.withAppendedPath(CONTENT_URI, "measure/" + String.valueOf(id));
+                uri = Uri.withAppendedPath(CONTENT_URI, "measure/" + String.valueOf(id));
+                break;
             case CODE_CATEGORY:
                 id = db.insertOrThrow(DatabaseContract.Categories.TABLE_NAME, null, simplifyName(
                         values, DatabaseContract.Categories.COLUMN_NAME
                 ));
-                return Uri.withAppendedPath(CONTENT_URI, "category/" + String.valueOf(id));
+                uri = Uri.withAppendedPath(CONTENT_URI, "category/" + String.valueOf(id));
+                cr.notifyChange(Uri.withAppendedPath(CONTENT_URI, "measure"), null);
+                break;
             case CODE_MEASURE_POINT:
                 measureId = Integer.parseInt(uri.getPathSegments().get(1));
                 values.put(DatabaseContract.MeasurePoints.COLUMN_MEASURE_ID, measureId);
                 id = db.insertOrThrow(DatabaseContract.MeasurePoints.TABLE_NAME, null, values);
-                return Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/point/" + id);
+                uri = Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/point/" + id);
+                break;
             case CODE_MEASURE_LINE:
                 measureId = Integer.parseInt(uri.getPathSegments().get(1));
                 values.put(DatabaseContract.MeasureLines.COLUMN_MEASURE_ID, measureId);
                 id = db.insertOrThrow(DatabaseContract.MeasureLines.TABLE_NAME, null, values);
-                return Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/line/" + id);
+                uri = Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/line/" + id);
+                break;
             case CODE_MEASURE_ANGLE:
                 measureId = Integer.parseInt(uri.getPathSegments().get(1));
                 values.put(DatabaseContract.MeasureAngles.COLUMN_MEASURE_ID, measureId);
                 id = db.insertOrThrow(DatabaseContract.MeasureAngles.TABLE_NAME, null, values);
-                return Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/angle/" + id);
+                uri = Uri.withAppendedPath(CONTENT_URI, "measure/" + measureId + "/angle/" + id);
+                break;
             default:
                 throw new IllegalArgumentException();
         }
+        cr.notifyChange(uri, null);
+        return uri;
     }
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int affected;
         switch (uriMatcher.match(uri)) {
             case CODE_MEASURE_SINGLE:
                 selection = DatabaseContract.Measures._ID + " = " + uri.getLastPathSegment();
-                return db.delete(DatabaseContract.Measures.TABLE_NAME, selection, null);
+                affected = db.delete(DatabaseContract.Measures.TABLE_NAME, selection, null);
+                break;
             case CODE_CATEGORY_SINGLE:
                 selection = DatabaseContract.Categories._ID + " = " + uri.getLastPathSegment();
-                return db.delete(DatabaseContract.Categories.TABLE_NAME, selection, null);
+                affected = db.delete(DatabaseContract.Categories.TABLE_NAME, selection, null);
+                cr.notifyChange(Uri.withAppendedPath(CONTENT_URI, "measure"), null);
+                break;
             case CODE_MEASURE_POINT_SINGLE:
                 selection = DatabaseContract.MeasurePoints.COLUMN_MEASURE_ID + " = " + uri.getPathSegments().get(1)
                         + " AND " + DatabaseContract.MeasurePoints._ID + " = " + uri.getLastPathSegment();
-                return db.delete(DatabaseContract.MeasurePoints.TABLE_NAME, selection, null);
+                affected = db.delete(DatabaseContract.MeasurePoints.TABLE_NAME, selection, null);
+                break;
             case CODE_MEASURE_LINE_SINGLE:
                 selection = DatabaseContract.MeasureLines.COLUMN_MEASURE_ID + " = " + uri.getPathSegments().get(1)
                         + " AND " + DatabaseContract.MeasureLines._ID + " = " + uri.getLastPathSegment();
-                return db.delete(DatabaseContract.MeasureLines.TABLE_NAME, selection, null);
+                affected = db.delete(DatabaseContract.MeasureLines.TABLE_NAME, selection, null);
+                break;
             case CODE_MEASURE_ANGLE_SINGLE:
                 selection = DatabaseContract.MeasureAngles.COLUMN_MEASURE_ID + " = " + uri.getPathSegments().get(1)
                         + " AND " + DatabaseContract.MeasureAngles._ID + " = " + uri.getLastPathSegment();
-                return db.delete(DatabaseContract.MeasureAngles.TABLE_NAME, selection, null);
+                affected = db.delete(DatabaseContract.MeasureAngles.TABLE_NAME, selection, null);
+                break;
             default:
                 throw new IllegalArgumentException();
         }
+        cr.notifyChange(uri, null);
+        return affected;
     }
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int affected;
         switch (uriMatcher.match(uri)) {
             case CODE_MEASURE_SINGLE:
                 selection = DatabaseContract.Measures._ID + " = " + uri.getLastPathSegment();
-                return db.update(DatabaseContract.Measures.TABLE_NAME, simplifyName(
+                affected = db.update(DatabaseContract.Measures.TABLE_NAME, simplifyName(
                         values, DatabaseContract.Measures.COLUMN_NAME
                 ), selection, null);
+                break;
             case CODE_CATEGORY_SINGLE:
                 selection = DatabaseContract.Categories._ID + " = " + uri.getLastPathSegment();
-                return db.update(DatabaseContract.Categories.TABLE_NAME, simplifyName(
+                affected = db.update(DatabaseContract.Categories.TABLE_NAME, simplifyName(
                         values, DatabaseContract.Categories.COLUMN_NAME
                 ), selection, null);
+                cr.notifyChange(Uri.withAppendedPath(CONTENT_URI, "measure"), null);
+                break;
             case CODE_MEASURE_POINT_SINGLE:
                 selection = DatabaseContract.MeasurePoints.COLUMN_MEASURE_ID + " = "  + uri.getPathSegments().get(1)
                     + " AND " +  DatabaseContract.MeasurePoints._ID + " = " + uri.getLastPathSegment();
-                return db.update(DatabaseContract.MeasurePoints.TABLE_NAME, simplifyNameNullable(
+                affected = db.update(DatabaseContract.MeasurePoints.TABLE_NAME, simplifyNameNullable(
                         values, DatabaseContract.MeasurePoints.COLUMN_NAME
                 ), selection, null);
+                break;
             case CODE_MEASURE_LINE_SINGLE:
                 selection = DatabaseContract.MeasureLines.COLUMN_MEASURE_ID + " = "  + uri.getPathSegments().get(1)
                         + " AND " +  DatabaseContract.MeasureLines._ID + " = " + uri.getLastPathSegment();
-                return db.update(DatabaseContract.MeasureLines.TABLE_NAME, simplifyNameNullable(
+                affected = db.update(DatabaseContract.MeasureLines.TABLE_NAME, simplifyNameNullable(
                         values, DatabaseContract.MeasureLines.COLUMN_NAME
                 ), selection, null);
+                break;
             case CODE_MEASURE_ANGLE_SINGLE:
                 selection = DatabaseContract.MeasureAngles.COLUMN_MEASURE_ID + " = "  + uri.getPathSegments().get(1)
                         + " AND " +  DatabaseContract.MeasureAngles._ID + " = " + uri.getLastPathSegment();
-                return db.update(DatabaseContract.MeasureAngles.TABLE_NAME, simplifyNameNullable(
+                affected = db.update(DatabaseContract.MeasureAngles.TABLE_NAME, simplifyNameNullable(
                         values, DatabaseContract.MeasureAngles.COLUMN_NAME
                 ), selection, null);
+                break;
             default:
                 throw new IllegalArgumentException();
         }
+        cr.notifyChange(uri, null);
+        return affected;
     }
 }

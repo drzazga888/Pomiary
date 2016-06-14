@@ -4,7 +4,6 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.utils.MathExtra;
@@ -81,12 +80,6 @@ public class MeasureAngleData extends MeasureDataElement {
     @Override
     public int getBarRes() {
         return R.layout.measure_element;
-    }
-
-    @Override
-    public void performSelectedActon() {
-        super.performSelectedActon();
-        Log.i("touching", "angle " + toString() + " is selected");
     }
 
     @NonNull

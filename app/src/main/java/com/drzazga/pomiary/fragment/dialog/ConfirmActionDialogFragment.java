@@ -99,7 +99,6 @@ public abstract class ConfirmActionDialogFragment extends DialogFragment impleme
         Integer singleSelected = adapter.getSelectedMaxOne();
         for (int i = 0; i < selected.size(); ++i) {
             list.add((Integer) layoutManager.findViewByPosition(selected.keyAt(i)).getTag());
-            adapter.notifyItemRemoved(selected.keyAt(i));
         }
         if (singleSelected != null)
             list.add((Integer) layoutManager.findViewByPosition(singleSelected).getTag());

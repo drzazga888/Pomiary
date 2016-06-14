@@ -3,12 +3,13 @@ package com.drzazga.pomiary.controller;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.util.Log;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.model.MeasureAngleData;
 import com.drzazga.pomiary.model.MeasureData;
 import com.drzazga.pomiary.model.MeasureDataElement;
@@ -19,24 +20,28 @@ import com.drzazga.pomiary.view.MeasureElementBarHolder;
 import com.drzazga.pomiary.view.MeasurePointBarHolder;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
-public class MeasureController implements CompassController.CompassListener {
+public class MeasureController implements DeltaCompassController.CompassListener {
 
+    private final Context context;
     public MeasureData model;
     private GuiHacks guiHacks;
     private MeasureDataElement selectedItem = null;
     private MeasureElementBarHolder bar = null;
-    private CompassController compass;
+    private DeltaCompassController compass;
+    private boolean compassWorking = false;
+    private Float compassValue;
+    private ActionMode mode;
 
     public MeasureController(int measureId, Context context) {
+        this.context = context;
         this.model = new MeasureData(context, measureId);
         this.guiHacks = (GuiHacks) context;
-        this.compass = new CompassController(context, this);
+        this.compass = new DeltaCompassController(context, this);
         loseFocus();
         model.load();
-        Log.i("sensor_test", "start");
-        //compass.start();
     }
 
     public View.OnClickListener buttonAddListener = new View.OnClickListener() {
@@ -109,19 +114,21 @@ public class MeasureController implements CompassController.CompassListener {
     }
 
     public boolean resolveSelected(PointF p) {
-        if (bar == null) {
-            for (MeasureDataElement item : model) {
-                if (item.isSelected(p)) {
-                    setSelectedItem(item);
-                    return true;
+        if (mode == null) {
+            if (bar == null) {
+                for (MeasureDataElement item : model) {
+                    if (item.isSelected(p)) {
+                        setSelectedItem(item);
+                        return true;
+                    }
                 }
+                loseFocus();
+                this.guiHacks.hideAllButtons();
+            } else {
+                setBarIndicators(p);
+                guiHacks.redraw();
+                return true;
             }
-            loseFocus();
-            this.guiHacks.hideAllButtons();
-        } else {
-            setBarIndicators(p);
-            guiHacks.redraw();
-            return true;
         }
         return false;
     }
@@ -247,6 +254,40 @@ public class MeasureController implements CompassController.CompassListener {
 
     @Override
     public void compassChanged(float degree) {
+        compassValue = degree;
+        guiHacks.redraw();
+        mode.setTitle(context.getString(R.string.compassWorking) + String.format(
+                Locale.getDefault(),
+                " %.2f" + (char) 0x00B0,
+                degree
+        ));
+    }
 
+    public Float getCompassValue() {
+        return compassValue;
+    }
+
+    public void activityPaused() {
+        compass.stop();
+    }
+
+    public void switchCompass() {
+        if (compassWorking) {
+            compass.stop();
+            compassValue = null;
+            mode = null;
+        }
+        else {
+            compass.start();
+            loseFocus();
+            guiHacks.hideAllButtons();
+        }
+        compassWorking = !compassWorking;
+        guiHacks.redraw();
+    }
+
+    public void compassContextInit(ActionMode mode) {
+        this.mode = mode;
+        mode.setTitle(R.string.compassEstablishing);
     }
 }

@@ -3,7 +3,6 @@ package com.drzazga.pomiary.model;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.utils.MathExtra;
@@ -42,13 +41,6 @@ public class MeasurePointData extends MeasureDataElement {
     @Override
     public int getBarRes() {
         return R.layout.measure_point;
-    }
-
-    @Override
-    public void performSelectedActon() {
-        super.performSelectedActon();
-        Log.i("touching", "point " + toString() + " is selected");
-
     }
 
     @NonNull

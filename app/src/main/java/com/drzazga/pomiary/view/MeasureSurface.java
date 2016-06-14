@@ -11,7 +11,7 @@ import android.graphics.PointF;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.ActionMode;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -77,15 +77,21 @@ public class MeasureSurface extends View {
         return focused;
     }
 
+    public void activityPaused() {
+        controller.activityPaused();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Float rotation = controller.getCompassValue();
+        if (rotation != null)
+            canvas.rotate(-rotation, (float) (getWidth() * 0.5), (float) (getHeight() * 0.5));
         canvas.translate(translation.x, translation.y);
         canvas.scale(scale, scale);
         Point pos, pos2;
         PointF strPos;
         for (MeasureAngleData angle : controller.model.angles.values()) {
-            Log.i("testing", String.valueOf(angle));
             canvas.drawArc(angle.getOval(), angle.getStartAngleDeg(), angle.getSweepAngleDeg(), false, decideOnPaint(angle, paintAngle, paintNotFocusedOutline));
         }
         for (MeasureLineData line : controller.model.lines.values()) {
@@ -131,6 +137,14 @@ public class MeasureSurface extends View {
         return controller.buttonSwitchListener;
     }
 
+    public void switchCompass() {
+        controller.switchCompass();
+    }
+
+    public void compassContextInit(ActionMode mode) {
+        controller.compassContextInit(mode);
+    }
+
     private class MeasureSurfaceScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
         private float prevSpan;
@@ -169,15 +183,8 @@ public class MeasureSurface extends View {
                 e.getX(),
                 e.getY()
             };
-            Log.i("touching", "before: (" + result[0] + ", " + result[1] + ")");
             matrix.mapPoints(result);
-            Log.i("touching", "after: (" + result[0] + ", " + result[1] + ")");
             return controller.resolveSelected(new PointF(result[0], result[1]));
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-            Log.i("touching", "onLongPress");
         }
 
         @Override

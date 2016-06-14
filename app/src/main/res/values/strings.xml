@@ -40,4 +40,7 @@
     <string name="name_hint">Nazwa</string>
     <string name="x_text">x =</string>
     <string name="y_text">y =</string>
+    <string name="switch_compass">Włącz / wyłącz autoobracanie</string>
+    <string name="compassEstablishing">Inicjowanie kompasu…</string>
+    <string name="compassWorking">Odchylenie:</string>
 </resources>

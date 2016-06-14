@@ -12,8 +12,8 @@ import com.drzazga.pomiary.fragment.MultiChoiceListFragment;
 
 public class HomePagerAdapter extends FragmentPagerAdapter {
 
-    public static final int MEASURE_LIST_FRAGMENT_ID = 0;
-    public static final int CATEGORY_LIST_FRAGMENT_ID = 1;
+    public static final int MEASURE_LIST_ID = 0;
+    public static final int CATEGORY_LIST_ID = 1;
     private MultiChoiceListFragment measureListFragment = new MeasureListFragment();
     private MultiChoiceListFragment categoryListFragment = new CategoryListFragment();
     private Context context;
@@ -25,9 +25,9 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 
     public MultiChoiceListFragment getSpecificItem(int position) {
         switch (position) {
-            case MEASURE_LIST_FRAGMENT_ID:
+            case MEASURE_LIST_ID:
                 return measureListFragment;
-            case CATEGORY_LIST_FRAGMENT_ID:
+            case CATEGORY_LIST_ID:
                 return categoryListFragment;
         }
         return null;
@@ -46,9 +46,9 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case MEASURE_LIST_FRAGMENT_ID:
+            case MEASURE_LIST_ID:
                 return context.getString(R.string.app_name);
-            case CATEGORY_LIST_FRAGMENT_ID:
+            case CATEGORY_LIST_ID:
                 return context.getString(R.string.categories);
         }
         return super.getPageTitle(position);

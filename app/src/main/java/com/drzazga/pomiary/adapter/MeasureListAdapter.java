@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,7 @@ public class MeasureListAdapter extends MultiChoiceCursorAdapter<MeasureListAdap
         }
     }
 
-    public MeasureListAdapter(Context context, Integer id) {
+    public MeasureListAdapter(Context context) {
         super(context);
     }
 
@@ -45,7 +44,6 @@ public class MeasureListAdapter extends MultiChoiceCursorAdapter<MeasureListAdap
     @Override
     public void onBindViewHolder(MeasureViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        Log.i("testing", "binduje, pozycja = " + position);
         String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ViewMeasures.COLUMN_NAME));
         String date = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ViewMeasures.COLUMN_CREATION_DATE));
         String category = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.ViewMeasures.COLUMN_CATEGORY_NAME));

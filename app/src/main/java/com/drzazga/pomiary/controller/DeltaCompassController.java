@@ -5,9 +5,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
-public class CompassController implements SensorEventListener {
+import com.drzazga.pomiary.utils.MathExtra;
+
+public class DeltaCompassController implements SensorEventListener {
+
+    private static final float TOLERANCE = (float) 0.5;
 
     public interface CompassListener {
         void compassChanged(float degree);
@@ -15,28 +18,34 @@ public class CompassController implements SensorEventListener {
 
     private final SensorManager manager;
     private Sensor sensor;
-    private boolean startPosNeedInit = false;
-    private float startPos;
+    private Float prevMeas, currMeas;
+    private boolean established;
     private CompassListener listener;
 
-    public CompassController(Context context, CompassListener listener) {
+    public DeltaCompassController(Context context, CompassListener listener) {
         this.listener = listener;
         this.manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        this.sensor = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    public boolean isAvailable() {
-        return sensor != null;
+        //noinspection deprecation
+        this.sensor = manager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
     }
 
     public void start() {
-        startPosNeedInit = true;
+        stop();
+        prevMeas = null;
+        currMeas = null;
+        established = false;
         manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stop() {
         manager.unregisterListener(this);
+    }
+
+    private void performStabilityCheck(float value) {
+        prevMeas = currMeas;
+        currMeas = value;
+        if (prevMeas != null && Math.abs(prevMeas - currMeas) < TOLERANCE)
+            established = true;
     }
 
     @Override
@@ -47,13 +56,10 @@ public class CompassController implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float val = event.values[1];
-        Log.i("sensor_test", "val =  " + val);
-        if (startPosNeedInit) {
-            startPos = val;
-            startPosNeedInit = false;
-        } else
-            listener.compassChanged(val - startPos);
+        if (!established)
+            performStabilityCheck(event.values[0]);
+        else
+            listener.compassChanged((float) MathExtra.deltaAngleDegree(currMeas, event.values[0]));
     }
 
     @Override

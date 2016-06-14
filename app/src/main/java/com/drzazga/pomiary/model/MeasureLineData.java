@@ -4,7 +4,6 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.drzazga.pomiary.R;
 import com.drzazga.pomiary.utils.MathExtra;
@@ -47,12 +46,6 @@ public class MeasureLineData extends MeasureDataElement {
     @Override
     public int getBarRes() {
         return R.layout.measure_element;
-    }
-
-    @Override
-    public void performSelectedActon() {
-        super.performSelectedActon();
-        Log.i("touching", "line " + toString() + " is selected");
     }
 
     @NonNull

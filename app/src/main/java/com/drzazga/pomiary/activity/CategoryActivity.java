@@ -9,18 +9,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.drzazga.pomiary.R;
+import com.drzazga.pomiary.adapter.HomePagerAdapter;
 import com.drzazga.pomiary.fragment.dialog.ConfirmActionDialogFragment;
 import com.drzazga.pomiary.fragment.dialog.ConfirmCategoryDeleteDialogFragment;
-import com.drzazga.pomiary.fragment.dialog.ConfirmMeasureDeleteDialogFragment;
 import com.drzazga.pomiary.model.DatabaseContract;
 import com.drzazga.pomiary.model.MeasureProvider;
 
-public class CategoryActivity extends CategoryPreviewActivity implements ConfirmActionDialogFragment.OnFinishedListener {
+public class CategoryActivity extends CategoryPreviewActivity implements ConfirmActionDialogFragment.OnFinishedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private int id;
     private ContentResolver resolver;
@@ -30,21 +33,7 @@ public class CategoryActivity extends CategoryPreviewActivity implements Confirm
         super.onCreate(savedInstanceState);
         id = getIntent().getExtras().getInt("id");
         resolver = getContentResolver();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Cursor c = resolver.query(Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "category/" + id), null, null, null, null);
-        assert c != null;
-        c.moveToFirst();
-        int color = Color.parseColor(c.getString(c.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_COLOR)));
-        inputName.setText(c.getString(c.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_NAME)));
-        c.close();
-        redBar.setProgress((color >> 16) & 0xFF);
-        greenBar.setProgress((color >> 8) & 0xFF);
-        blueBar.setProgress((color) & 0xFF);
-        onProgressChanged(null, 0, false);
+        getSupportLoaderManager().initLoader(HomePagerAdapter.CATEGORY_LIST_ID, null, this);
     }
 
     @Override
@@ -84,5 +73,29 @@ public class CategoryActivity extends CategoryPreviewActivity implements Confirm
     @Override
     public void onFinishedDialog() {
         NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, Uri.withAppendedPath(MeasureProvider.CONTENT_URI, "category"), null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        data.moveToFirst();
+        while (data.getInt(data.getColumnIndexOrThrow(DatabaseContract.Categories._ID)) != id)
+            data.moveToNext();
+        int color = Color.parseColor(data.getString(data.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_COLOR)));
+        inputName.setText(data.getString(data.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_NAME)));
+        data.close();
+        redBar.setProgress((color >> 16) & 0xFF);
+        greenBar.setProgress((color >> 8) & 0xFF);
+        blueBar.setProgress((color) & 0xFF);
+        onProgressChanged(null, 0, false);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

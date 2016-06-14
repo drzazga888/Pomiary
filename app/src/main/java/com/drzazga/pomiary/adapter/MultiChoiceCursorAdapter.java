@@ -2,34 +2,52 @@ package com.drzazga.pomiary.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DataSetObserver;
-import android.os.Handler;
 import android.provider.BaseColumns;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
-import android.widget.AdapterView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CursorAdapter;
 
 import com.drzazga.pomiary.R;
 
 public abstract class MultiChoiceCursorAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-    protected AdapterView.OnItemClickListener itemClick;
-    protected AdapterView.OnItemLongClickListener longItemClick;
     protected Cursor cursor;
     protected Context context;
-    private DataSetObserver mDataSetObserver;
     private SparseBooleanArray selectedItems;
     private Integer selectedItem;
     protected Integer id;
+    private CursorAdapter cursorAdapter;
 
     public MultiChoiceCursorAdapter(Context context) {
-        this.cursor = null;
         this.context = context;
-        this.mDataSetObserver = new NotifyingDataSetObserver();
         this.selectedItems = new SparseBooleanArray();
         this.selectedItem = null;
         this.id = null;
+        this.cursorAdapter = new CursorAdapter(context, null, 0) {
+
+            @Override
+            public View newView(Context context, Cursor cursor, ViewGroup parent) {
+                return null;
+            }
+
+            @Override
+            public void bindView(View view, Context context, Cursor cursor) {
+
+            }
+
+            @Override
+            public void notifyDataSetChanged() {
+                super.notifyDataSetChanged();
+                MultiChoiceCursorAdapter.this.notifyDataSetChanged();
+            }
+        };
+    }
+
+    public CursorAdapter getCursorAdapter() {
+        return cursorAdapter;
     }
 
     public void toggleSelection(int position) {
@@ -80,27 +98,9 @@ public abstract class MultiChoiceCursorAdapter<VH extends RecyclerView.ViewHolde
         return selectedItems;
     }
 
-    public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == cursor)
-            return null;
-        final Cursor oldCursor = cursor;
-        if (oldCursor != null && mDataSetObserver != null)
-            oldCursor.unregisterDataSetObserver(mDataSetObserver);
-        cursor = newCursor;
-        if (cursor != null && mDataSetObserver != null)
-            cursor.registerDataSetObserver(mDataSetObserver);
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
-        return oldCursor;
-    }
-
     @Override
     public void onBindViewHolder(VH holder, int position) {
+        cursor = getCursorAdapter().getCursor();
         cursor.moveToPosition(position);
         int currentId = cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID));
         if (id != null && id == currentId) {
@@ -116,6 +116,7 @@ public abstract class MultiChoiceCursorAdapter<VH extends RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
+        cursor = getCursorAdapter().getCursor();
         if (cursor == null)
             return 0;
         else
@@ -125,20 +126,5 @@ public abstract class MultiChoiceCursorAdapter<VH extends RecyclerView.ViewHolde
     public void selectById(Integer categoryId) {
         id = categoryId;
         notifyDataSetChanged();
-    }
-
-    private class NotifyingDataSetObserver extends DataSetObserver {
-
-        @Override
-        public void onChanged() {
-            super.onChanged();
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onInvalidated() {
-            super.onInvalidated();
-            notifyDataSetChanged();
-        }
     }
 }

@@ -11,7 +11,7 @@ import com.drzazga.pomiary.R;
 public abstract class MultiChoiceListFragment extends BaseListFragment
         implements MultiChoiceListCallbacks {
 
-    @MenuRes private int menuRes;
+    @MenuRes private int contextMenuRes;
     private ActionMode savedMode = null;
 
     private String getTitle() {
@@ -20,11 +20,11 @@ public abstract class MultiChoiceListFragment extends BaseListFragment
 
     public MultiChoiceListFragment() {
         super();
-        menuRes = getMenuRes();
+        contextMenuRes = getContextMenuRes();
     }
 
     @MenuRes
-    protected abstract int getMenuRes();
+    protected abstract int getContextMenuRes();
 
     @Override
     public void onClick(View v, int position) {
@@ -49,7 +49,7 @@ public abstract class MultiChoiceListFragment extends BaseListFragment
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     savedMode = mode;
                     mode.setTitle(getTitle());
-                    getActivity().getMenuInflater().inflate(menuRes, menu);
+                    getActivity().getMenuInflater().inflate(contextMenuRes, menu);
                     return true;
                 }
 

@@ -15,6 +15,13 @@ public class MathExtra {
         return angle;
     }
 
+    public static double deltaAngleDegree(double angle1, double angle2) {
+        double delta = angle2 - angle1;
+        if (delta < 0.0)
+            delta += 360.0;
+        return delta;
+    }
+
     public static boolean betweenAngles(double theta, double startAngle, double endAngle) {
         if (startAngle <= endAngle)
             return startAngle < theta && endAngle > theta;

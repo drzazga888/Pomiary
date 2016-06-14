@@ -53,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/select_category_color"
-                    android:id="@+id/select_category_name_hint" />
+                    android:id="@+id/select_category_name_hint"
+                    tools:ignore="RelativeOverlap" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -63,7 +64,8 @@
                     android:id="@+id/colorValue"
                     android:layout_alignBottom="@+id/select_category_name_hint"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_alignParentEnd="true"
+                    tools:ignore="HardcodedText" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -71,7 +73,7 @@
                 android:layout_height="60dp"
                 android:background="@color/colorNotFocused"
                 android:layout_marginBottom="@dimen/little_margin"
-                android:id="@+id/colorIndicator"></RelativeLayout>
+                android:id="@+id/colorIndicator"/>
 
             <GridLayout
                 android:layout_width="match_parent"
@@ -97,7 +99,8 @@
                     android:text="112"
                     android:id="@+id/redValue"
                     android:layout_row="0"
-                    android:layout_column="1" />
+                    android:layout_column="1"
+                    tools:ignore="HardcodedText" />
 
                 <SeekBar
                     android:layout_width="wrap_content"
@@ -116,7 +119,8 @@
                     android:text="43"
                     android:id="@+id/greenValue"
                     android:layout_row="1"
-                    android:layout_column="1" />
+                    android:layout_column="1"
+                    tools:ignore="HardcodedText" />
 
                 <SeekBar
                     android:layout_width="wrap_content"
@@ -135,7 +139,8 @@
                     android:text="55"
                     android:id="@+id/blueValue"
                     android:layout_row="2"
-                    android:layout_column="1" />
+                    android:layout_column="1"
+                    tools:ignore="HardcodedText" />
 
             </GridLayout>
 

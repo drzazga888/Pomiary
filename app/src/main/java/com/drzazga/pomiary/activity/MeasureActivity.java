@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -26,7 +27,7 @@ import com.drzazga.pomiary.model.DatabaseContract;
 import com.drzazga.pomiary.model.MeasureProvider;
 import com.drzazga.pomiary.view.MeasureSurface;
 
-public class MeasureActivity extends AppCompatActivity implements ConfirmActionDialogFragment.OnFinishedListener, GuiHacks {
+public class MeasureActivity extends AppCompatActivity implements ConfirmActionDialogFragment.OnFinishedListener, GuiHacks, ActionMode.Callback {
 
     private ContentResolver resolver;
     private Toolbar toolbar;
@@ -90,6 +91,12 @@ public class MeasureActivity extends AppCompatActivity implements ConfirmActionD
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        surface.activityPaused();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_measure, menu);
         return true;
@@ -110,6 +117,11 @@ public class MeasureActivity extends AppCompatActivity implements ConfirmActionD
                 Intent intent = new Intent(this, MeasureSettingsActivity.class);
                 intent.putExtra("id", id);
                 startActivity(intent);
+                return true;
+            case R.id.action_switch_compass:
+                surface.switchCompass();
+                startActionMode(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -165,5 +177,26 @@ public class MeasureActivity extends AppCompatActivity implements ConfirmActionD
     public void redraw() {
         if (surface != null)
             surface.invalidate();
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        surface.compassContextInit(mode);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        surface.switchCompass();
     }
 }

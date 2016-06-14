@@ -1,10 +1,8 @@
 package com.drzazga.pomiary.adapter;
 
 import android.content.Context;
-import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,7 @@ public class CategoryListAdapter extends MultiChoiceCursorAdapter<CategoryListAd
         }
     }
 
-    public CategoryListAdapter(Context context, Integer id) {
+    public CategoryListAdapter(Context context) {
         super(context);
     }
 
@@ -41,7 +39,6 @@ public class CategoryListAdapter extends MultiChoiceCursorAdapter<CategoryListAd
     @Override
     public void onBindViewHolder(CategoryViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        Log.i("testing", DatabaseUtils.dumpCursorToString(cursor));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_NAME));
         String borderColor = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.Categories.COLUMN_COLOR));
         holder.name.setText(name);

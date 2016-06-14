@@ -8,8 +8,6 @@ import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.util.Log;
 
-import com.drzazga.pomiary.view.MeasureElementBarHolder;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;

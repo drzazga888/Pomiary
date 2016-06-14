@@ -1,12 +1,8 @@
 package com.drzazga.pomiary.model;
 
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
-import android.view.ActionMode;
-import android.view.Menu;
 
 public abstract class MeasureDataElement {
 
